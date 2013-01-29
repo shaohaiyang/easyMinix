@@ -4,7 +4,7 @@ SERVICES="crond haldaemon messagebus network local sshd rsyslog"
 
 BIN="awk sh cat chown date dmesg find egrep gawk hostname ln mkdir mknod netstat pwd stty touch uname basename chgrp cp df false grep ipcalc login mount ping rm sleep sync true usleep bash chmod cut echo fgrep gzip kill ls mv ps sed sort tar umount vi dd traceroute plymouth dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen"
 SBIN="arp agetty halt ifup udevd udevadm pidof runlevel arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon dhclient-script ifdown iptables iptables-multi mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
-USR_BIN="bzip2 du vim file groups ldd passwd ssh tty w whereis clear less ssh-add wc expr free id logger scp ssh-keygen screen uptime wget which dirname tput xargs top tr md5sum"
+USR_BIN="bzip2 du vim file groups ldd passwd ssh tty w whereis clear less ssh-add wc expr free id logger scp ssh-keygen screen uptime wget which dirname tput xargs top tr md5sum head tail"
 USR_SBIN="adduser lsof crond ntpdate sshd useradd ntpdate ntpd tcpdump hald"
 
 rm -rf $MOUNTROOT
