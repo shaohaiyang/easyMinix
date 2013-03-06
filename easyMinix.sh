@@ -1,8 +1,11 @@
 #!/bin/sh
-MOUNTROOT="/root/usb_os"
-SERVICES="crond haldaemon messagebus network local sshd rsyslog"
+MOUNTROOT="/root/mini_os"
+KERNEL_VER="3.8.2.stack"
+SERVICES="crond network local sshd rsyslog"
+[ -z $KERNEL_VER ] && KERNEL_VER=$(uname -r)
 
-BIN="awk sh cat chown date dmesg find egrep gawk hostname ln mkdir mknod netstat pwd stty touch uname basename chgrp cp df false grep ipcalc login mount ping rm sleep sync true usleep bash chmod cut echo fgrep gzip kill ls mv ps sed sort tar umount vi dd traceroute plymouth dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen"
+NET_DRIVER=$(dmesg|awk '{IGNORECASE=1}/eth.* link up/{print $1}')
+BIN="awk sh cat chown date dmesg find env egrep gawk hostname ln mkdir mknod mktemp netstat pwd stty touch uname basename chgrp cp df false grep ipcalc login mount ping rm sleep sync true usleep bash chmod cut echo fgrep gzip kill ls mv ps sed sort tar umount vi dd traceroute plymouth dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen"
 SBIN="arp agetty halt ifup udevd udevadm pidof runlevel arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon dhclient-script ifdown iptables iptables-multi mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
 USR_BIN="bzip2 du vim file groups ldd passwd ssh tty w whereis clear less ssh-add wc expr free id logger scp ssh-keygen screen uptime wget which dirname tput xargs top tr md5sum head tail"
 USR_SBIN="adduser lsof crond ntpdate sshd useradd ntpdate ntpd tcpdump hald"
@@ -93,7 +96,7 @@ rm -rf /root/*.txt
 #cd $MOUNTROOT/dev
 #./make_devices
  
-cp -a /etc/cron.d /etc/*-release /etc/udev /etc/dbus-* /etc/ethers /etc/bashrc /etc/fstab /etc/group /etc/host* /etc/init* /etc/issue /etc/iproute2 /etc/ld.so.c* /etc/localtime /etc/login.defs /etc/modprobe.d/ /etc/mtab /etc/pam.d/ /etc/passwd /etc/profile* /etc/protocols /etc/rc* /etc/resolv.conf /etc/secur* /etc/services /etc/shadow /etc/shells /etc/ssh/ /etc/sudoers /etc/sysconfig/ /etc/sysctl.* /etc/terminfo/ /etc/rsyslog* /etc/selinux $MOUNTROOT/etc
+cp -a /etc/cron.d /etc/*-release /etc/udev /etc/dbus-* /etc/ethers /etc/bashrc /etc/fstab /etc/group /etc/host* /etc/init* /etc/issue /etc/iproute2 /etc/ld.so.c* /etc/localtime /etc/login.defs /etc/modprobe.d/ /etc/pam.d/ /etc/passwd /etc/profile* /etc/protocols /etc/rc* /etc/resolv.conf /etc/secur* /etc/services /etc/shadow /etc/shells /etc/ssh/ /etc/sudoers /etc/sysconfig/ /etc/sysctl.* /etc/terminfo/ /etc/rsyslog* /etc/selinux $MOUNTROOT/etc
 
 rm -rf $MOUNTROOT/etc/ld.so.cache
 rm -rf $MOUNTROOT/etc/ld.so.conf.d/*
@@ -111,6 +114,7 @@ echo 'export LC_ALL=C' >> $MOUNTROOT/etc/profile
 echo 'export PS1="[\u@\h \W]\\$ "' >> $MOUNTROOT/etc/profile
 echo '' > /etc/sysconfig/i18n
 echo -e "/lib\n/lib64\n/usr/lib\n/usr/lib64\n/usr/local/lib\n/usr/local/lib64" > $MOUNTROOT/etc/ld.so.conf.d/system.conf
+echo -e "\n# detect own machine network card and load it.\nmodprobe $NET_DRIVER" >> $MOUNTROOT/etc/rc.sysinit
 
 for i in $SERVICES;do
 	mv $MOUNTROOT/etc/rc3.d/*$i* $MOUNTROOT/tmp
@@ -126,3 +130,7 @@ cp -a /usr/libexec/openssh $MOUNTROOT/usr/libexec/
 cp -a /lib/terminfo $MOUNTROOT/lib
 cp -a /usr/share/terminfo/x $MOUNTROOT/lib/terminfo
 cp -a /usr/share/file $MOUNTROOT/usr/share/
+cp -a /boot/grub $MOUNTROOT/boot/
+cp -a /boot/*-$KERNEL_VER* $MOUNTROOT/boot/
+cp -a /lib/modules/$KERNEL_VER $MOUNTROOT/lib/modules/
+
