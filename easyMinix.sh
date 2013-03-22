@@ -1,21 +1,25 @@
 #!/bin/sh
-MOUNTROOT="/root/mini_os"
+MOUNTROOT="/root/upyun_work/mini_os"
 KERNEL_VER="3.8.2.stack"
 SERVICES="crond network local sshd rsyslog"
+LABEL="/Amy"
+LABEL_SWAP="/SWAP"
+
 [ -z $KERNEL_VER ] && KERNEL_VER=$(uname -r)
 
 NET_DRIVER=$(dmesg|awk '{IGNORECASE=1}/eth.* link up/{print $1}')
 BIN="awk sh cat chown date dmesg find env egrep gawk hostname ln mkdir mknod mktemp netstat pwd stty touch uname basename chgrp cp df false grep ipcalc login mount ping rm sleep sync true usleep bash chmod cut echo fgrep gzip kill ls mv ps sed sort tar umount vi dd traceroute plymouth dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen"
-SBIN="arp agetty halt ifup udevd udevadm pidof runlevel arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon dhclient-script ifdown iptables iptables-multi mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
-USR_BIN="bzip2 du vim file groups ldd passwd ssh tty w whereis clear less ssh-add wc expr free id logger scp ssh-keygen screen uptime wget which dirname tput xargs top tr md5sum head tail"
+SBIN="arp agetty chkconfig ethtool e2label halt ifup udevd udevadm partx partprobe pidof runlevel arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon dhclient-script ifdown iptables iptables-multi mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
+USR_BIN="bc bzip2 du diff dig vim file groups ldd passwd pkill ssh tty w whereis clear less ssh-add wc expr free id logger scp ssh-keygen screen strace uniq uptime wget which dirname tput xargs top tr md5sum nohup nslookup head tail"
 USR_SBIN="adduser lsof crond ntpdate sshd useradd ntpdate ntpd tcpdump hald"
 
 rm -rf $MOUNTROOT
 mkdir $MOUNTROOT
 cd $MOUNTROOT
-mkdir -p bin boot dev etc sys lib/modules lib64/{modules,security,tls} home mnt proc root sbin tmp usr/{bin,sbin,lib64,libexec,local,share} var/{empty,lock,run,spool,lib,www,log}
-mkdir -p usr/share/locale var/empty/sshd var/lock/subsys var/spool/cron var/lib/dhcp usr/local/{etc,bin,sbin,lib64,include,libexec,share,var,src}
+mkdir -p bin boot dev etc sys lib/modules lib64/{modules,security,tls} home mnt proc root sbin tmp usr/{bin,sbin,lib,lib64,libexec,local,share} var/{empty,lock,run,spool,lib,www,log}
+mkdir -p usr/local/{etc,bin,sbin,lib,lib64,include,libexec,share}
 mkdir -p usr/lib64/perl5/CORE var/run/netreport var/{run,lib}/dbus
+mkdir -p usr/share/{locale,misc,zoneinfo} var/empty/sshd var/lock/subsys var/spool/cron var/lib/dhcp 
 
 bincp(){
 	rm -rf /tmp/bin.tmp
@@ -90,31 +94,33 @@ sbincp
 usr_bincp
 usr_sbincp
 rm -rf /tmp/*.tmp
-rm -rf /root/*.txt
+rm -rf /root/*bin.txt
 
 #cp -a /root/make_devices $MOUNTROOT/dev
 #cd $MOUNTROOT/dev
 #./make_devices
  
-cp -a /etc/cron.d /etc/*-release /etc/udev /etc/dbus-* /etc/ethers /etc/bashrc /etc/fstab /etc/group /etc/host* /etc/init* /etc/issue /etc/iproute2 /etc/ld.so.c* /etc/localtime /etc/login.defs /etc/modprobe.d/ /etc/pam.d/ /etc/passwd /etc/profile* /etc/protocols /etc/rc* /etc/resolv.conf /etc/secur* /etc/services /etc/shadow /etc/shells /etc/ssh/ /etc/sudoers /etc/sysconfig/ /etc/sysctl.* /etc/terminfo/ /etc/rsyslog* /etc/selinux $MOUNTROOT/etc
+cp -a /etc/cron.d /etc/*-release /etc/udev /etc/dbus-* /etc/ethers /etc/bashrc /etc/fstab /etc/group /etc/host* /etc/init* /etc/issue /etc/iproute2 /etc/ld.so.c* /etc/localtime /etc/login.defs /etc/modprobe.d/ /etc/nsswitch.conf /etc/ntp* /etc/pam.d/ /etc/passwd /etc/profile* /etc/protocols /etc/rc* /etc/resolv.conf /etc/secur* /etc/services /etc/shadow /etc/shells /etc/ssh/ /etc/sudoers /etc/sysconfig/ /etc/sysctl.* /etc/terminfo/ /etc/rsyslog* /etc/selinux $MOUNTROOT/etc
 
 rm -rf $MOUNTROOT/etc/ld.so.cache
 rm -rf $MOUNTROOT/etc/ld.so.conf.d/*
 rm -rf $MOUNTROOT/etc/cron.d/*
 rm -rf $MOUNTROOT/etc/rsyslog.d/*
 rm -rf $MOUNTROOT/etc/selinux/targeted/*
-rm -rf $MOUNTROOT/etc/rc.d/rc{2,4,5}.d 
-rm -rf $MOUNTROOT/etc/rc{2,4,5}.d
-rm -rf $MOUNTROOT/etc/rc{0,1,3,6}.d/K*
-rm -rf $MOUNTROOT/etc/rc{0,1,3,6}.d/*openstack*
+rm -rf $MOUNTROOT/etc/rc.d/init.d/*openstack*
+rm -rf $MOUNTROOT/etc/rc.d/rc{2,4,5}.d/*
+rm -rf $MOUNTROOT/etc/rc{2,4,5}.d/*
+rm -rf $MOUNTROOT/etc/rc{1,3,6}.d/*openstack*
+rm -rf $MOUNTROOT/etc/rc{1,3,6}.d/K*
 rm -rf $MOUNTROOT/etc/profile.d/*.csh
-sed -r -i '/export LC_ALL/d' $MOUNTROOT/etc/profile
-sed -r -i '/export PS1=/d' $MOUNTROOT/etc/profile
+
+sed -r -i -e '/export LC_ALL/d' -e '/export PS1=/d' -e '/cp=/d' -e '/ls=/d' $MOUNTROOT/etc/profile
 echo 'export LC_ALL=C' >> $MOUNTROOT/etc/profile
 echo 'export PS1="[\u@\h \W]\\$ "' >> $MOUNTROOT/etc/profile
-echo '' > /etc/sysconfig/i18n
+echo -e "alias cp=\"cp -a\"\nalias ls=\"ls --color\"\nalias grep=\"grep --color\"\n\n" >> $MOUNTROOT/etc/profile
+> $MOUNTROOT/etc/sysconfig/i18n
 echo -e "/lib\n/lib64\n/usr/lib\n/usr/lib64\n/usr/local/lib\n/usr/local/lib64" > $MOUNTROOT/etc/ld.so.conf.d/system.conf
-echo -e "\n# detect own machine network card and load it.\nmodprobe $NET_DRIVER" >> $MOUNTROOT/etc/rc.sysinit
+echo -e "\n# detect own machine network card and load it.\nmodprobe $NET_DRIVER\nmodprobe e1000\nmodprobe e1000e\nldconfig\nsleep 1\n[ -x /usr/bin/set_network.sh ] && sh /usr/bin/set_network.sh" >> $MOUNTROOT/etc/rc.sysinit
 
 for i in $SERVICES;do
 	mv $MOUNTROOT/etc/rc3.d/*$i* $MOUNTROOT/tmp
@@ -123,14 +129,28 @@ done
 rm -rf $MOUNTROOT/etc/rc3.d/*
 mv $MOUNTROOT/tmp/* $MOUNTROOT/etc/rc3.d/
 
-cp -a /lib64/libwrap.so* /lib64/libdb-* /lib64/libnss_files* /lib64/libnss_dns* /lib64/libnss_compat* /lib64/libexpat* /lib64/xtables /lib64/security /lib64/rsyslog $MOUNTROOT/lib64/
-cp -a /usr/lib64/libdbus-glib-* /usr/lib64/cracklib_dict.* /usr/lib64/libcrack.so.* /usr/lib64/libsasl2.so.* /usr/lib64/libdb-*.so $MOUNTROOT/usr/lib64/
-
-cp -a /usr/libexec/openssh $MOUNTROOT/usr/libexec/
-cp -a /lib/terminfo $MOUNTROOT/lib
-cp -a /usr/share/terminfo/x $MOUNTROOT/lib/terminfo
-cp -a /usr/share/file $MOUNTROOT/usr/share/
 cp -a /boot/grub $MOUNTROOT/boot/
 cp -a /boot/*-$KERNEL_VER* $MOUNTROOT/boot/
 cp -a /lib/modules/$KERNEL_VER $MOUNTROOT/lib/modules/
+sed -r -i "/root=/s:(.*) root=.* (e.*):\1 root=LABEL=$LABEL \2:g" $MOUNTROOT/boot/grub/grub.conf
+sed -r -i "/default/s:.*:default=0:g" $MOUNTROOT/boot/grub/grub.conf
+sed -r -i "/hiddenmenu/d" $MOUNTROOT/boot/grub/grub.conf
+grep -i "title.*$KERNEL_VER*" $MOUNTROOT/boot/grub/grub.conf -A3 > /tmp/.xxx
+sed -r -i "/kernel \/vmlinuz/s:\/vmlinuz:\/boot\/vmlinuz:g" /tmp/.xxx
+sed -r -i "/initrd \/initramfs/s:\/initramfs:\/boot\/initramfs:g" /tmp/.xxx
+sed -r -i '/title/,/initrd/d' $MOUNTROOT/boot/grub/grub.conf
+cat /tmp/.xxx >> $MOUNTROOT/boot/grub/grub.conf;rm -rf /tmp/.xxx
 
+sed -r -i "/\/ /s:.*(\/.*):LABEL=$LABEL\t\t\1:g" $MOUNTROOT/etc/fstab
+sed -r -i "/swap/s:.*(swap.*swap):LABEL=$LABEL_SWAP\t\t\1:g" $MOUNTROOT/etc/fstab
+sed -r -i "/UUID/d" $MOUNTROOT/etc/fstab
+
+cp -a /lib64/libwrap.so* /lib64/libfreebl3.so /lib64/libdb-* /lib64/libnss_files* /lib64/libnss_dns* /lib64/libnss_compat* /lib64/libexpat* /lib64/xtables /lib64/security /lib64/rsyslog $MOUNTROOT/lib64/
+cp -a /usr/lib64/libdbus-glib-* /usr/lib64/cracklib_dict.* /usr/lib64/libcrack.so.* /usr/lib64/libsasl2.so.* /usr/lib64/libdb-*.so $MOUNTROOT/usr/lib64/
+cp -a /usr/libexec/openssh $MOUNTROOT/usr/libexec/
+cp -a /usr/share/file $MOUNTROOT/usr/share/
+cp -a /usr/share/misc/magic* $MOUNTROOT/usr/share/misc/
+cp -a /usr/share/cracklib $MOUNTROOT/usr/share/
+cp -a /usr/share/zoneinfo/Asia $MOUNTROOT/usr/share/zoneinfo/
+cp -a /lib/terminfo $MOUNTROOT/lib
+cp -a /usr/share/terminfo/{p,r,s,x} $MOUNTROOT/lib/terminfo
