@@ -1,6 +1,7 @@
 #!/bin/sh
-MOUNTROOT="/root/upyun_work/mini_os"
-KERNEL_VER="3.8.5.stack"
+MOUNTROOT="/root/work/mini_os"
+PUPPET_TOOL="1"
+KERNEL_VER="3.8.13.upyun"
 SERVICES="crond network local sshd rsyslog"
 LABEL="/Amy"
 LABEL_SWAP="/SWAP"
@@ -9,9 +10,11 @@ LABEL_SWAP="/SWAP"
 
 NET_DRIVER=$(dmesg|awk '{IGNORECASE=1}/eth.* link up/{print $1}')
 BIN="awk sh cat chown date dmesg find env egrep gawk hostname ln mkdir mknod mktemp more netstat pwd stty touch uname basename chgrp cp df false grep ipcalc login mount ping rm sleep sync true usleep bash chmod cut echo fgrep gzip kill ls mv ps sed sort tar umount vi dd traceroute plymouth dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen"
-SBIN="arp agetty chkconfig ethtool e2label halt ifup udevd udevadm partx partprobe pidof runlevel arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon dhclient-script ifdown iptables iptables-multi mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
-USR_BIN="bc bzip2 du diff dig vim file groups ldd passwd pkill ssh tty w whereis clear less ssh-add wc expr free id logger scp ssh-keygen screen strace uniq uptime wget which dirname tput xargs top tr md5sum nohup nc nslookup head tail rsync"
-USR_SBIN="adduser lsof crond ntpdate sshd useradd ntpdate ntpd tcpdump hald"
+SBIN="arp agetty chkconfig ethtool e2label halt ifup udevd udevadm partx partprobe pidof runlevel arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon sushell dhclient-script ifdown iptables mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
+USR_BIN="bc bzip2 chage du diff dig vim file groups ldd passwd pkill ssh tty w whereis clear less ssh-add wc expr free id logger scp ssh-keygen screen strace uniq uptime wget which dirname tput xargs top tr md5sum nohup nc nslookup head tail tee telnet rsync"
+USR_SBIN="adduser lsof crond ntpdate sshd useradd usermod userdel ntpdate ntpd tcpdump hald"
+PUPPET_USR_BIN="puppet filebucket pi puppetdoc ralsh facter ruby erb"
+PUPPET_USR_SBIN="puppetca puppetd"
 
 rm -rf $MOUNTROOT
 mkdir $MOUNTROOT
@@ -57,7 +60,7 @@ sbincp(){
 
 usr_bincp(){
         rm -rf /tmp/usr_bin.tmp
-        for i in $USR_BIN;do
+        for i in $USR_BIN $PUPPET_USR_BIN;do
                 cp -a /usr/bin/$i $MOUNTROOT/usr/bin
                 for j in `ldd /usr/bin/$i`;do
 			[ -f $j ] && echo $j >> /tmp/usr_bin.tmp
@@ -74,7 +77,7 @@ usr_bincp(){
 
 usr_sbincp(){
         rm -rf /tmp/usr_sbin.tmp
-        for i in $USR_SBIN;do
+        for i in $USR_SBIN $PUPPET_USR_SBIN;do
                 cp -a /usr/sbin/$i $MOUNTROOT/usr/sbin/
                 for j in `ldd /usr/sbin/$i`;do
 			[ -f $j ] && echo $j >> /tmp/usr_sbin.tmp
@@ -147,7 +150,7 @@ sed -r -i "/UUID/d" $MOUNTROOT/etc/fstab
 sed -r -i "/swift/d" $MOUNTROOT/etc/fstab
 sed -r -i '/.*local.*/!d' $MOUNTROOT/etc/hosts
 
-cp -a /lib64/libwrap.so* /lib64/libfreebl3.so /lib64/libdb-* /lib64/libnss_files* /lib64/libnss_dns* /lib64/libnss_compat* /lib64/libexpat* /lib64/xtables /lib64/security /lib64/rsyslog $MOUNTROOT/lib64/
+cp -a /lib64/libwrap.so* /lib64/libfreebl3.so /lib64/libdb-* /lib64/libnss_files* /lib64/libnss_dns* /lib64/libnss_compat* /lib64/libexpat* /lib64/xtables* /lib64/security /lib64/rsyslog $MOUNTROOT/lib64/
 cp -a /usr/lib64/libdbus-glib-* /usr/lib64/cracklib_dict.* /usr/lib64/libcrack.so.* /usr/lib64/libsasl2.so.* /usr/lib64/libdb-*.so $MOUNTROOT/usr/lib64/
 cp -a /usr/libexec/openssh $MOUNTROOT/usr/libexec/
 cp -a /usr/share/file $MOUNTROOT/usr/share/
@@ -156,3 +159,11 @@ cp -a /usr/share/cracklib $MOUNTROOT/usr/share/
 cp -a /usr/share/zoneinfo/Asia $MOUNTROOT/usr/share/zoneinfo/
 cp -a /lib/terminfo $MOUNTROOT/lib
 cp -a /usr/share/terminfo/{p,r,s,x} $MOUNTROOT/lib/terminfo
+
+# copy puppet needed file and library
+if [ $PUPPET_TOOL = 1 ];then
+	cp -a /etc/puppet $MOUNTROOT/etc
+	cp -a /usr/lib/ruby $MOUNTROOT/usr/lib/
+	cp -a /usr/lib64/ruby $MOUNTROOT/usr/lib64/
+	cp -a /var/lib/puppet $MOUNTROOT/var/lib/
+fi

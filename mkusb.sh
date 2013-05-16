@@ -2,7 +2,8 @@
 DEV="/dev/sdc"
 LABEL="/Amy"
 LABEL_SWAP="/SWAP"
-UPYUN_DIR="/root/upyun_work"
+UPYUN_DIR="/root/work"
+MOUNT="/media"
 UP_MOCCA=mocha.tgz
 
 read -p "You must supply a network configration. (`pwd`/network.info)" NETWORK_CONF
@@ -44,13 +45,14 @@ partprobe $DEV
 
 mkfs.ext4 -L $LABEL ${DEV}1
 mkswap -L $LABEL_SWAP ${DEV}2
-mount ${DEV}1 /mnt
+mount ${DEV}1 $MOUNT
 
-cd $UPYUN_DIR/mini_os/;tar cvf - *|(cd /mnt;tar xvf -);cd -
-cp -a $UPYUN_DIR/$UP_MOCCA /mnt/root/
-cp -a $NETWORK_CONF /mnt/
-mkdir -m 600 -p /mnt/root/.ssh
-cp -a /root/.ssh/authorized_keys /mnt/root/.ssh
+cd $UPYUN_DIR/mini_os/;tar cvf - *|(cd $MOUNT;tar xvf -);cd -
+cp -a $UPYUN_DIR/$UP_MOCCA $MOUNT/root/
+cp -a $NETWORK_CONF $MOUNT/
+mkdir -m 600 -p $MOUNT/root/.ssh
+cp -a /root/.ssh/authorized_keys $MOUNT/root/.ssh
+sed -r -i '/^PasswordAuthentication/s:.*:PasswordAuthentication no:' $MOUNT/etc/ssh/sshd_config
 
-grub-install --root-directory=/mnt --no-floppy --recheck $DEV
-umount /mnt
+grub-install --root-directory=$MOUNT --no-floppy --recheck $DEV
+umount $MOUNT
