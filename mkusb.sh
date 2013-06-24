@@ -52,7 +52,8 @@ cp -a $UPYUN_DIR/$UP_MOCCA $MOUNT/root/
 cp -a $NETWORK_CONF $MOUNT/
 mkdir -m 600 -p $MOUNT/root/.ssh
 cp -a /root/.ssh/authorized_keys $MOUNT/root/.ssh
+cp -a `pwd`/ceph_id_rsa  $MOUNT/root/.ssh/id_rsa
+cat `pwd`/ceph_authorized_keys >> $MOUNT/root/.ssh/authorized_keys
 sed -r -i '/^PasswordAuthentication/s:.*:PasswordAuthentication no:' $MOUNT/etc/ssh/sshd_config
-
 grub-install --root-directory=$MOUNT --no-floppy --recheck $DEV
 umount $MOUNT
