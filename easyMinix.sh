@@ -10,7 +10,7 @@ LABEL_SWAP="/SWAP"
 
 NET_DRIVER=$(dmesg|awk '{IGNORECASE=1}/eth.* link up/{print $1}'|head -1)
 BIN="awk sh cat chown date dmesg find env egrep gawk hostname ln mkdir mknod mktemp more netstat pwd stty touch uname basename chgrp cp df false grep ipcalc login mount ping rm sleep sync true usleep bash chmod cut echo fgrep gzip kill ls mv ps sed sort tar umount vi dd traceroute plymouth dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen zcat"
-SBIN="arp agetty chkconfig ethtool e2label halt ifup udevd udevadm partx partprobe pidof runlevel rmmod arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon sushell dhclient-script ifdown iptables mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
+SBIN="arp agetty chkconfig ethtool e2label halt ifup ifenslave udevd udevadm partx partprobe pidof runlevel rmmod arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon sushell dhclient-script ifdown iptables mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
 USR_BIN="bc bzip2 chage du diff dig vim file groups ldd passwd pkill ssh tty w whereis clear less ssh-add wc whoami expr free id logger scp ssh-keygen screen strace seq uniq uptime wget which dirname tput xargs top tr md5sum nohup nc nslookup head tail tee telnet rsync"
 USR_SBIN="adduser brctl lsof crond ntpdate sshd useradd usermod userdel ntpdate ntpd tcpdump hald"
 PUPPET_USR_BIN="puppet filebucket pi puppetdoc ralsh facter ruby erb"
@@ -111,11 +111,15 @@ rm -rf $MOUNTROOT/etc/cron.d/*
 rm -rf $MOUNTROOT/etc/rsyslog.d/*
 rm -rf $MOUNTROOT/etc/selinux/targeted/*
 rm -rf $MOUNTROOT/etc/rc.d/init.d/*openstack*
+rm -rf $MOUNTROOT/etc/rc.d/init.d/*quantum*
+rm -rf $MOUNTROOT/etc/rc.d/init.d/*java*
+rm -rf $MOUNTROOT/etc/rc.d/init.d/*rpc*
 rm -rf $MOUNTROOT/etc/rc.d/rc{2,4,5}.d/*
 rm -rf $MOUNTROOT/etc/rc{2,4,5}.d/*
 rm -rf $MOUNTROOT/etc/rc{1,3,6}.d/*openstack*
 rm -rf $MOUNTROOT/etc/rc{1,3,6}.d/K*
 rm -rf $MOUNTROOT/etc/profile.d/*.csh
+rm -rf $MOUNTROOT/etc/sysconfig/network-scripts/ifcfg-br*
 
 sed -r -i -e '/export LC_ALL/d' -e '/export PS1=/d' -e '/cp=/d' -e '/ls=/d' $MOUNTROOT/etc/profile
 echo 'export LC_ALL=C' >> $MOUNTROOT/etc/profile
@@ -124,7 +128,7 @@ echo -e "alias cp=\"cp -a\"\nalias ls=\"ls --color\"\nalias grep=\"grep --color\
 > $MOUNTROOT/etc/sysconfig/i18n
 echo -e "/lib\n/lib64\n/usr/lib\n/usr/lib64\n/usr/local/lib\n/usr/local/lib64" > $MOUNTROOT/etc/ld.so.conf.d/system.conf
 echo -e "# detect own machine network card and load it." >> $MOUNTROOT/etc/rc.sysinit
-echo -e "modprobe e1000\nmodprobe e1000e\nmodprobe mpt2sas" >> $MOUNTROOT/etc/rc.sysinit
+echo -e "modprobe r8169\nmodprobe e1000\nmodprobe e1000e\nmodprobe mpt2sas" >> $MOUNTROOT/etc/rc.sysinit
 echo -e "ldconfig\nsleep 1\n[ -x /usr/bin/set_network.sh ] && sh /usr/bin/set_network.sh" >> $MOUNTROOT/etc/rc.sysinit
 
 for i in $SERVICES;do
@@ -152,8 +156,8 @@ sed -r -i "/UUID/d" $MOUNTROOT/etc/fstab
 sed -r -i "/swift/d" $MOUNTROOT/etc/fstab
 sed -r -i '/.*local.*/!d' $MOUNTROOT/etc/hosts
 
-cp -a /lib64/libwrap.so* /lib64/libfreebl3.so /lib64/libdb-* /lib64/libnss_files* /lib64/libnss_dns* /lib64/libnss_compat* /lib64/libexpat* /lib64/xtables* /lib64/security /lib64/rsyslog $MOUNTROOT/lib64/
-cp -a /usr/lib64/libdbus-glib-* /usr/lib64/cracklib_dict.* /usr/lib64/libcrack.so.* /usr/lib64/libsasl2.so.* /usr/lib64/libdb-*.so /usr/lib64/libpcap.so.* $MOUNTROOT/usr/lib64/
+cp -a /lib64/libuuid.so* /lib64/libwrap.so* /lib64/libfreebl3.so /lib64/libdb-* /lib64/libnss_files* /lib64/libnss_dns* /lib64/libnss_compat* /lib64/libexpat* /lib64/xtables* /lib64/security /lib64/rsyslog $MOUNTROOT/lib64/
+cp -a /usr/lib64/libuuid.so* /usr/lib64/libaio.so* /usr/lib64/libdbus-glib-* /usr/lib64/cracklib_dict.* /usr/lib64/libcrack.so.* /usr/lib64/libsasl2.so.* /usr/lib64/libdb-*.so /usr/lib64/libpcap.so.* $MOUNTROOT/usr/lib64/
 cp -a /usr/libexec/openssh $MOUNTROOT/usr/libexec/
 cp -a /usr/share/file $MOUNTROOT/usr/share/
 cp -a /usr/share/misc/magic* $MOUNTROOT/usr/share/misc/
