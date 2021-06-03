@@ -1,7 +1,7 @@
 #!/bin/sh
 MOUNTROOT="/root/work/mini_os"
 PUPPET_TOOL="1"
-KERNEL_VER="3.8.13.upyun"
+KERNEL_VER="4.9.618.upyun"
 SERVICES="crond network local sshd rsyslog"
 LABEL="/Amy"
 LABEL_SWAP="/SWAP"
