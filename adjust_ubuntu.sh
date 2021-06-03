@@ -10,7 +10,7 @@ LANGUAGE="en_US.en"
 EOF
 locale-gen en_US.UTF-8
 apt update
-apt install -y systemd logrotate ncat lldpd curl ethtool lsscsi ntpdate smartmontools network-manager vim openssh-server ifupdown net-tools netplan.io sysstat python3-pip jq netcat xfsprogs bind9-dnsutils iproute2 tcpdump
+apt install -y systemd logrotate ncat lldpd curl ethtool lsscsi ntpdate smartmontools network-manager vim openssh-server ifupdown net-tools netplan.io sysstat python3-pip jq netcat xfsprogs bind9-dnsutils iproute2 tcpdump iputils-*
 
 systemctl start lldpd && systemctl enable lldpd
 timedatectl set-timezone $ZONE

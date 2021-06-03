@@ -8,6 +8,7 @@ fi
 nmcli -v|grep -iq version >/dev/null 2>&1
 if [ $? = 0 ];then
         IS_NetworkManager="yes"
+	sed -r -i '/managed/s@=.*@=true@g' /etc/NetworkManager/NetworkManager.conf 
         if [ -x /usr/sbin/netplan ] ;then
 cat >  /etc/netplan/00-installer-config.yaml <<EOF
 network:
