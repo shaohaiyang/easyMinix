@@ -8,13 +8,18 @@ fi
 nmcli -v|grep -iq version >/dev/null 2>&1
 if [ $? = 0 ];then
         IS_NetworkManager="yes"
-	sed -r -i '/managed/s@=.*@=true@g' /etc/NetworkManager/NetworkManager.conf 
-        if [ -x /usr/sbin/netplan ] ;then
+	sed -r -i '/managed/s@=.*@=true@g' /etc/NetworkManager/NetworkManager.conf
+	if [ -x /usr/sbin/netplan ] ;then
 cat >  /etc/netplan/00-installer-config.yaml <<EOF
 network:
   renderer: NetworkManager
 EOF
-        fi
+	fi
+fi
+
+if [ ! -z $HOSTNAME ];then
+	hostnamectl set-hostname --static $HOSTNAME
+	hostnamectl set-hostname --pretty $HOSTNAME
 fi
 
 if [ -z $IS_NetworkManager ];then
@@ -23,7 +28,7 @@ if [ -z $IS_NetworkManager ];then
 else
         rm -rf /etc/sysconfig/network-scripts/ifcfg-bond*
         systemctl stop network && systemctl disable network
-        [ -x /usr/sbin/netplan ] && netplan apply
+	[ -x /usr/sbin/netplan ] && netplan apply
         nmcli -t -f UUID con show| xargs nmcli connection down
         nmcli -t -f UUID con show| xargs nmcli connection del 
 fi
@@ -103,10 +108,10 @@ if [ -z $IS_NetworkManager ];then
 else                                                                                                                               
         systemctl unmask NetworkManager
         systemctl enable NetworkManager
-        systemctl start NetworkManager
+        systemctl restart NetworkManager
 fi
 ln -snf /etc/rc.d/rc.local /etc/rc.local
 
 for dns in $DNS;do
         echo "nameserver $dns" >> /etc/resolv.conf
-done
+done       

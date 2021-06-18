@@ -20,12 +20,18 @@ timedatectl set-ntp 0
 timedatectl set-local-rtc 0
 
 setenforce 0
-ssh-keygen -t rsa -b 4096 -P "" -f ~/.ssh/id_rsa
-curl -X GET -o ~/.ssh/authorized_keys http://xxxxxxxxx/authorized_keys
-chmod 0400 ~/.ssh/*
+#echo root.com | passwd root --stdin
 
 grep -iq shaohy /root/.ssh/authorized_keys
-[ $? = 0 ] && sed -r -i "/#Port 22/s^.*^Port $SSHPORT^g;/^PasswordAuthentication/s^yes^no^g" /etc/ssh/sshd_config
+if [ $? = 0 ] ;then
+	sed -r -i "/#Port 22/s^.*^Port $SSHPORT^g;/^PasswordAuthentication/s^yes^no^g" /etc/ssh/sshd_config
+else
+        ssh-keygen -t rsa -b 4096 -P "" -f ~/.ssh/id_rsa
+        rm -rf ~/.ssh/id_rsa*
+	curl -X GET -o ~/.ssh/authorized_keys http://xxxxxxxxx/authorized_keys
+fi
+chmod 0400 ~/.ssh/*
+
 sed -r -i  '/^SELINUX=/s^=.*^=disabled^g' /etc/selinux/config
 sed -r -i '/^[^root]/s:/bin/bash:/sbin/nologin:g' /etc/passwd
 sed -r -i -e '/DefaultLimitCORE/s^.*^DefaultLimitCORE=infinity^g' -e '/DefaultLimitNOFILE/s^.*^DefaultLimitNOFILE=100000^g' -e '/DefaultLimitNPROC/s^.*^Defau
@@ -62,7 +68,7 @@ cat > /etc/cron.d/xxxxxxx <<EOF
 SHELL=/bin/bash
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 CRON_TZ=$ZONE
-*/10 * * * * root (/usr/sbin/ntpdate -o3  211.115.194.21 133.100.11.8 142.3.100.15)
+*/10 * * * * root (/usr/sbin/ntpdate pool.ntp.org)
 EOF
 
 yum install -y tree ntpdate telnet bc nc net-tools wget lsof rsync nmon bash-completion \
@@ -86,9 +92,9 @@ sed -r -i 's/biosdevname=0//g;s/net.ifnames=0//g' /etc/sysconfig/grub
 sed -r -i 's/biosdevname=0//g;s/net.ifnames=0//g' /etc/default/grub
 $(ip link|grep -iq "eth[0-9]\{1,3\}:.*up") && sed -r -i '/GRUB_CMDLINE_LINUX/s^(.*)="(.*)"$^\1="\2 biosdevname=0 net.ifnames=0"^g' /etc/sysconfig/grub
 $(ip link|grep -iq "eth[0-9]\{1,3\}:.*up") && sed -r -i '/GRUB_CMDLINE_LINUX/s^(.*)="(.*)"$^\1="\2 biosdevname=0 net.ifnames=0"^g' /etc/default/grub
-ntpdate -o3 211.115.194.21 133.100.11.8 142.3.100.15
+ntpdate pool.ntp.org
 
-sed -r -i '$a /usr/sbin/ntpdate -u -o3 192.168.147.20 ntp.aliyun.com 211.115.194.21' /etc/rc.d/rc.local
+sed -r -i '$a /usr/sbin/ntpdate pool.ntp.org ntp.aliyun.com ' /etc/rc.d/rc.local
 
 for file in set_irq.sh set_net_smp_affinity.sh set_rps.sh;do
         chmod +x /usr/local/sbin/$file

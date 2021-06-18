@@ -1,0 +1,11 @@
+[Unit]
+Description=Setting Network Info
+Before=network.target
+
+[Service]
+EnvironmentFile=/network.info
+ExecStart=/usr/local/sbin/set_network.sh
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
