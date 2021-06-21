@@ -12,7 +12,7 @@ NET_DRIVER=$(dmesg|awk '{IGNORECASE=1}/eth.* link up/{print $1}'|head -1)
 BIN="awk sh cat chown date dmesg find env egrep gawk hostname ln mkdir mknod mktemp more netstat pwd stty touch uname basename chgrp cp df false grep ipcalc login mount ping rm sleep sync true usleep bash chmod cut echo fgrep gzip kill ls mv ps sed sort tar umount vi dd traceroute plymouth dbus-cleanup-sockets dbus-daemon dbus-monitor dbus-send dbus-uuidgen zcat"
 SBIN="arp agetty chkconfig ethtool e2label halt ifup ifenslave udevd udevadm partx partprobe pidof runlevel rmmod arping hdparm init initctl ldconfig shutdown tune2fs consoletype fdisk hwclock mingetty swapoff telinit dhclient fsck fsck.ext4 ifconfig ip mke2fs poweroff plymouthd swapon sushell dhclient-script ifdown iptables mkfs.ext3 mkfs.ext4 reboot sysctl killall5 mkswap route rsyslogd tc insmod lsmod modprobe start_udev fstab-decode MAKEDEV"
 USR_BIN="bc bzip2 chage du diff dig vim file groups ldd passwd pkill ssh tty w whereis clear less ssh-add wc whoami expr free id logger scp ssh-keygen screen strace seq uniq uptime wget which dirname tput xargs top tr md5sum nohup nc nslookup head tail tee telnet rsync"
-USR_SBIN="adduser brctl lsof crond ntpdate sshd useradd usermod userdel ntpdate ntpd tcpdump hald"
+USR_SBIN="adduser brctl lsof crond ntpdate sshd useradd usermod userdel ntpdate ntpd tcpdump halt"
 PUPPET_USR_BIN="puppet filebucket pi puppetdoc ralsh facter ruby erb"
 PUPPET_USR_SBIN="puppetca puppetd"
 
