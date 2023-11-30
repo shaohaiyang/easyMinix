@@ -30,7 +30,7 @@ if [ $? = 0 ] ;then
 else
         ssh-keygen -t rsa -b 4096 -P "" -f ~/.ssh/id_rsa
         rm -rf ~/.ssh/id_rsa*
-        curl -X GET -o ~/.ssh/authorized_keys http://xxxxxxxxxxxxxxxxxx/resource/authorized_keys
+	curl -X GET -o ~/.ssh/authorized_keys http://xxxxxxxxx/authorized_keys
         chmod 0400 ~/.ssh/*
 fi
 
@@ -44,7 +44,7 @@ sed -r -i -e '/Compress=/s@.*@Compress=yes@g; /SystemMaxUse=/s@.*@SystemMaxUse=4
 
 for bad in iptable_nat nf_nat nf_conntrack nf_conntrack_ipv4 nf_defrag_ipv4;do
         sed -r -i "/$bad/d" /etc/modprobe.d/blacklist.conf
-        #echo "blacklist $bad" >>  /etc/modprobe.d/blacklist.conf
+        echo "blacklist $bad" >>  /etc/modprobe.d/blacklist.conf
 done
 echo nf_conntrack > /usr/lib/modules-load.d/net.conf
 echo "options nf_conntrack hashsize=262144" > /etc/modprobe.d/nf_conntrack.conf
